@@ -201,7 +201,8 @@ export function Header() {
     // { title: "Ask Web3Agent", src: "https://i.imgur.com/2pHVHza.png", slug: "/", tab: "askWeb3Agent" },
     { title: "Send Transacetion", src: "https://i.imgur.com/XjBwspt.png", slug: "/", tab: "sendTxn" },
     // { title: "Deploy Contracts", src: "https://i.imgur.com/VT7UdPH.png", slug: "/", tab: "deployContract" },
-    { title: "Defi", src: "https://i.imgur.com/IYxIvAB.png", slug: "/defi-prompt" },
+     { title: "Defi", src: "https://i.imgur.com/IYxIvAB.png", slug: "/defi-prompt" },
+    { title: "Builder", src: "https://i.imgur.com/IYxIvAB.png", slug: "/builder" },
   ];
 
   return (
