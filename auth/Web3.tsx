@@ -139,7 +139,7 @@ const baobab: Chain = {
   testnet: false,
 };
 
-const NETWORKS = [polygonZkEvmTestnet,baseGoerli,zeta_testnet, goerli, polygon,  polygonMumbai, klaytn, baseGoerli, lineaTestnet]
+const NETWORKS = [polygonZkEvmTestnet, baseGoerli, zeta_testnet, goerli, polygon, polygonMumbai, klaytn, baseGoerli]
 const { chains, provider } = configureChains(NETWORKS, [infuraProvider({ apiKey: "" }), publicProvider()])
 
 const { connectors } = getDefaultWallets({

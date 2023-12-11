@@ -1,8 +1,13 @@
+'use  client'
 import React, { useEffect, useMemo, useState } from 'react';
 import Web3 from 'web3';
 import { fromWei } from 'web3-utils';
 import Image from 'next/image';
-
+import { CovalentClient } from "@covalenthq/client-sdk";
+import { useAccount, useNetwork } from 'wagmi';
+import { CHAINID_TO_NETWORK_MAPPING } from '../../constants/ChainIdToNetworkMapping';
+import { convertAmountFromRawNumber } from '@/app/api-helpers/formatters';
+import { configs } from '../../configs';
 interface TokenData {
   symbol: string;
   name: string;
@@ -79,7 +84,7 @@ const ERC20_ABI = [
 ];
 
 const getWeb3 = () => {
-  
+
   const infuraApiUrl = `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`;
   const provider = new Web3.providers.HttpProvider(infuraApiUrl);
   return new Web3(provider);
@@ -99,11 +104,25 @@ const getTokenBalance = async (contract: any, accountAddress: string) => {
   }
 };
 
-const TokenBalancesComponent: React.FC = () =>
-{
-  
-  const [account, setAccount] = useState<string | null>(null);
+const TokenBalancesComponent: React.FC = () => {
 
+  const [account, setAccount] = useState<string | null>(null);
+  const [accountBalance, setAccountBalance] = useState<any>([]);
+  const { address, } = useAccount();
+  const { chain } = useNetwork()
+  // console.log({ address, chain })
+  const ApiServicesForBalance = async () => {
+    console.log('===')
+    const client = new CovalentClient(configs.NEXT_PUBLIC_COVALENT_KEY!);
+    const networkName = CHAINID_TO_NETWORK_MAPPING[chain?.id!]
+    console.log({ networkName })
+    const resp = await client.BalanceService.getHistoricalTokenBalancesForWalletAddress(networkName, address!);
+    setAccountBalance(resp?.data?.items || [])
+    console.log("==> ", { resp, networkName, chain })
+  }
+  useEffect(() => {
+    ApiServicesForBalance()
+  }, [])
   useEffect(() => {
     const getAccount = async () => {
       try {
@@ -111,13 +130,13 @@ const TokenBalancesComponent: React.FC = () =>
         if (window.ethereum) {
           // Use MetaMask provider
           const web3 = new Web3(window.ethereum);
-          
+
           // Request account access if needed
           await window.ethereum.request({ method: 'eth_requestAccounts' });
-          
+
           // Get the connected accounts
           const accounts = await web3.eth.getAccounts();
-          
+
           // Set the first account as the current account
           setAccount(accounts[0]);
         } else {
@@ -129,13 +148,13 @@ const TokenBalancesComponent: React.FC = () =>
     };
 
     getAccount();
-  }, [] );
-  
-   const [tokenBalances, setTokenBalances] = useState<{ [symbol: string]: string }>({});
-  const accountAddress = '0x7bfee91193d9df2ac0bfe90191d40f23c773c060'; // Replace with the actual Ethereum address
-    // const accountAddress = account
+  }, []);
 
- const tokenData: TokenData[] = useMemo(
+  const [tokenBalances, setTokenBalances] = useState<{ [symbol: string]: string }>({});
+  const accountAddress = '0x7bfee91193d9df2ac0bfe90191d40f23c773c060'; // Replace with the actual Ethereum address
+  // const accountAddress = account
+
+  const tokenData: TokenData[] = useMemo(
     () => [
       { symbol: 'ETH', name: 'Ethereum', image: 'ETH_IMAGE_URL', address: '', abi: [] },
       { symbol: 'WETH', name: 'Wrapped Ethereum', image: 'https://static.debank.com/image/arb_token/logo_url/0x82af49447d8a07e3bd95bd0d56f35241523fbab1/61844453e63cf81301f845d7864236f6.png', address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', abi: ERC20_ABI },
@@ -171,31 +190,30 @@ const TokenBalancesComponent: React.FC = () =>
 
   return (
     <div>
-     
-          <ul>
-              <li className={"flex  rounded-md p-2 cursor-pointer hover:bg-gray-300 active:bg-gray-200 !text-gray-700  text-sm font-semibold items-center gap-x-4 mt-20"}
-              > <h2>Balances</h2></li>
-              {Object.entries(tokenBalances).map(([symbol, balance]) => {
-          const tokenInfo = tokenData.find((t) => t.symbol === symbol);
-          if (!tokenInfo) return null;
 
-          const formattedBalance = parseFloat(Web3.utils.fromWei(balance, 'ether')).toFixed(2);
+      <ul>
+        <li className={"flex  rounded-md p-2 cursor-pointer hover:bg-gray-300 active:bg-gray-200 !text-gray-700  text-sm font-semibold items-center gap-x-4 mt-20"}
+        > <h2>Balances</h2></li>
+        {!!(accountBalance && accountBalance.length) && (
+          accountBalance?.map((token: any, index: number) => (
 
-          return (
+
             <li className={"flex  rounded-md p-2 cursor-pointer hover:bg-gray-300 active:bg-gray-200 !text-gray-700  text-sm font-semibold items-center gap-x-4 mt-2"}
-                  key={ symbol }>
-                  {/* {tokenInfo.name} */}
-            <img height={"30px"} width={"30px"} src={tokenInfo.image} alt={symbol}/>
+              key={index}>
+              {/* {tokenInfo.name} */}
+              <img height={"30px"} width={"30px"} src={token.logo_url} alt={token?.contract_ticker_symbol} />
 
-                  { symbol }: { formattedBalance } 
-                  
+              {token.contract_ticker_symbol} : {convertAmountFromRawNumber(token?.balance)}
+
               {/* <img src={tokenInfo.image} alt={symbol} style={{ width: '20px', height: '20px', marginLeft: '5px' }} /> */}
             </li>
-          );
-        })}
-        
-     
-            
+
+          ))
+        )}
+
+
+
+
       </ul>
     </div>
   );

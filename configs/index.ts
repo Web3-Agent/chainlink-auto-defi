@@ -32,4 +32,5 @@ export const configs = {
     BLOCK_PI_METER_RPC_KEY: process.env.BLOCK_PI_METER_RPC_KEY,
     BLOCK_PI_BASE_RPC_KEY: process.env.BLOCK_PI_BASE_RPC_KEY,
     BLOCK_PI_LINEA_RPC_KEY: process.env.BLOCK_PI_LINEA_RPC_KEY,
+    NEXT_PUBLIC_COVALENT_KEY: process.env.NEXT_PUBLIC_COVALENT_KEY
 }; 
