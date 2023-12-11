@@ -1,6 +1,6 @@
 module.exports = {
     apps: [{
-        name: "auto-defi",
+        name: "chainlink-auto-defi",
         script: "npm start"
     }]
 }
