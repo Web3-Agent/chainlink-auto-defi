@@ -202,10 +202,6 @@ export function Header() {
     { title: "Send Transacetion", src: "https://i.imgur.com/XjBwspt.png", slug: "/", tab: "sendTxn" },
     // { title: "Deploy Contracts", src: "https://i.imgur.com/VT7UdPH.png", slug: "/", tab: "deployContract" },
     { title: "Defi", src: "https://i.imgur.com/IYxIvAB.png", slug: "/defi-prompt" },
-
-    { title: "View History", src: "https://i.imgur.com/TW9s7qs.png", slug: "/history", tab: "viewHistory" },
-    { title: "Manage History", src: "https://i.imgur.com/g0as0Mv.png", slug: "/manage-history", tab: "manageHistory" },
-
   ];
 
   return (
